@@ -46,7 +46,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@4.0.0
         with:
           token: ${{secrets.PUSH_TOKEN3}} # Token 
-          branch: app # The branch the action should deploy to.
+          branch: publish # The branch the action should deploy to.
           repository-name: cherrybase/cherrybase.github.io # The repo the action should deploy to.
           commit-message: ${{ steps.extract_branch.outputs.branch }}.${{ steps.extract_branch.outputs.sha_short }}
           folder: dist # The folder the action should deploy.
