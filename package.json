@@ -1,5 +1,5 @@
 {
-  "name": "CherryAgent",
+  "name": "cherrywebpick",
   "version": "1.0.0",
   "description": "This SDK helps you to identify users and track their website behavior to understand their journey across your website.",
   "main": "index.js",
