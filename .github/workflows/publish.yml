@@ -44,7 +44,7 @@ jobs:
 
       - name: Create CDN Folder
         shell: bash
-        run: mv dist cdn
+        run: mv ./dist ./cdn
         
       - name: Deploy 
         uses: JamesIves/github-pages-deploy-action@4.0.0
