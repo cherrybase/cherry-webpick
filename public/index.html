@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <title>Sample Web SDK Integration</title>
+    <!-- <script type="text/javascript">
+      (function (
+        _window,
+        _document,
+        customElementName,
+        sdkUrl,
+        sdkObjectName,
+        customElement,
+        topCustomElement,
+        argument_app_id
+      ) {
+        _window.sampleSDK_object = sdkObjectName;
+        t = {};
+        q = function (f) {
+          return function () {
+            (_window.sampleSDK_q = _window.sampleSDK_q || []).push({
+              f: f,
+              a: arguments,
+            });
+          };
+        };
+        (f = [
+          "track_event",
+          "add_user_attribute",
+          "add_first_name",
+          "add_last_name",
+          "add_email",
+          "add_mobile",
+          "add_user_name",
+          "add_gender",
+          "add_birthday",
+          "destroy_session",
+          "add_unique_user_id",
+          "moe_events",
+          "call_web_push",
+          "track",
+          "location_type_attribute",
+        ]),
+          (h = { onsite: ["getData", "registerCallback"] });
+        for (k in f) {
+          t[f[k]] = q(f[k]);
+        }
+        for (k in h)
+          for (l in h[k]) {
+            null == t[k] && (t[k] = {}), (t[k][h[k][l]] = q(k + "." + h[k][l]));
+          }
+
+        customElement = _document.createElement(customElementName);
+        topCustomElement = _document.getElementsByTagName(customElementName)[0]; // grab the top script tag of the page since we need to insert our sdk above all
+        customElement.async = 1;
+        customElement.src = sdkUrl;
+        topCustomElement.parentNode.insertBefore(
+          customElement,
+          topCustomElement
+        );
+        _window.moe =
+          _window.moe ||
+          function () {
+            argument_app_id = arguments[0];
+            return t;
+          };
+        customElement.onload = function () {
+          if (argument_app_id) {
+            _window[sdkObjectName] = moe(argument_app_id);
+          }
+        };
+      })(window, document, "script", "./../src/sdk.js", "SampleSDK");
+
+      SampleSDK = moe({
+        app_id: "XXXXXXXXXXXXXXXXXXXXXXXX", // here goes your App Id
+        debug_logs: 0,
+        enableSPA: true,
+      });
+      console.log({ SampleSDK });
+    </script> -->
+    <script src="/CherryAgent.globals.js"></script>
+    <script>
+      CherryAgent.init({
+        consumerKey: "1fxb4orbwe8sr",
+        enableSPA: true,
+        logLevel: 6
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Sample Web SDK Integration</h1>
+  </body>
+</html>
