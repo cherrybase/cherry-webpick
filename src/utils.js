@@ -639,6 +639,12 @@ var utils = {
       }
     },
 
+    deviceType: function (user_agent) {
+      user_agent = user_agent || window.navigator.userAgent;
+      const isMobi = /Mobi/i.test(user_agent);
+      return isMobi ? "MOBILE" : "DESKTOP";
+    },
+
     referringDomain: function (referrer) {
       referrer = referrer || document.referrer;
       var split = referrer.split("/");
@@ -653,13 +659,15 @@ var utils = {
         ua: window.navigator.userAgent,
         os: utils.info.os(),
         browser: utils.info.browser(),
-        referrer: document.referrer,
-        referring_domain: utils.info.referringDomain(document.referre),
-        device: utils.info.device(),
-        current_url: window.location.href,
         browser_version: utils.info.browserVersion(),
+        // referrer: document.referrer,
+        // referring_domain: utils.info.referringDomain(document.referrer),
+        device: utils.info.device(),
+        deviceType: utils.info.deviceType(),
         screen_height: screen.height,
         screen_width: screen.width,
+        current_url: window.location.href,
+        channel: "WEB"
       };
     },
   },

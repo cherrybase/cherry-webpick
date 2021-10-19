@@ -1,16 +1,20 @@
-import { CONFIG, APP_CONSTANTS, EVENT_NAME_CONSTANTS, EVENT_URL_CONSTANTS } from "./config";
+import {
+  CONFIG,
+  APP_CONSTANTS,
+  EVENT_NAME_CONSTANTS,
+  EVENT_URL_CONSTANTS,
+} from "./config";
 import { utils, _ } from "./utils";
 import LoggerService from "./logger";
 import ApiService from "./fetch";
 import { getPersistence } from "./persistence";
 import { getClientFp, getUaDerivedProperties } from "./clientInfo";
 
-export var _logger = {}; // initiated only when app is initiated. Had to pull out to global context.
-
 export default function () {
-  // properties uplifted instead of binding to context
+  // properties uplifted instead of binding to context.
   var _options = {};
   var _persist = {};
+  var _logger = {};
   var _api = {};
   var globalInstance = {
     init: async function (options) {
@@ -18,7 +22,13 @@ export default function () {
 
       _options["consumerKey"] = options["consumerKey"];
       _options["appVersion"] = options["appVersion"];
-      _options["enableSPA"] = options["enableSPA"];
+      _options["trackAppRoutes"] = options["trackAppRoutes"];
+      if (
+        !["AUTO", "MANUAL"].includes(
+          (options["trackAppRoutes"] || "").toUpperCase()
+        )
+      )
+        _options["trackAppRoutes"] = "MANUAL";
       _options["host"] =
         options["host"] || APP_CONSTANTS.HOST + APP_CONSTANTS.SERVLET_CONTEXT;
       _options["disableReferrer"] = options["disableReferrer"];
@@ -39,8 +49,7 @@ export default function () {
 
       _options["logLevel"] = options["logLevel"] || LoggerService.NONE;
       _options["logPrefix"] =
-        options["logPrefix"] ||
-        `${CONFIG.LIB_NAME}__v${CONFIG.LIB_VERSION}`;
+        options["logPrefix"] || `${CONFIG.LIB_NAME}__v${CONFIG.LIB_VERSION}`;
 
       _logger = new LoggerService(_options);
       _api = new ApiService({
@@ -53,8 +62,8 @@ export default function () {
           "This library need to be initiated on the client side"
         );
       }
-      if (_options["enableSPA"]) {
-        loadRouteListeners();
+      if (_options["trackAppRoutes"] === "AUTO") {
+        addRouteListeners();
       }
 
       try {
@@ -86,6 +95,7 @@ export default function () {
           {
             eventName,
             eventData,
+            ...(options.eventMeta ? { eventMeta: options.eventMeta } : {}),
           },
           {
             headers: {
@@ -99,7 +109,33 @@ export default function () {
       }
     },
     pageVisited: function (eventData = {}, options = {}) {
-      this.trackEvent(EVENT_NAME_CONSTANTS.PAGE_VISITED, eventData, options);
+      let { meta = {}, ...rest } = eventData;
+      let {
+        pageLoad = false,
+        pageTitle,
+        pageReferrer,
+        pageOrigin,
+        pagePathname,
+        pageSearch,
+        pageHash,
+      } = meta;
+      let _meta = {
+        pageLoad,
+        pageTitle: pageTitle || window.document.title,
+        pageReferrer: pageReferrer || window.document.referrer,
+        pageOrigin: pageOrigin || window.document.location.origin,
+        pagePathname: pagePathname || window.document.location.pathname,
+        pageSearch: pageSearch || window.document.location.search,
+        pageHash: pageHash || window.document.location.hash,
+      };
+      return this.trackEvent(
+        EVENT_NAME_CONSTANTS.PAGE_VISITED,
+        {
+          ...rest,
+          meta: { ..._meta },
+        },
+        options
+      );
     },
   };
 
@@ -111,38 +147,60 @@ export default function () {
       );
   }
 
-  function loadRouteListeners() {
+  function addRouteListeners() {
+    function onListen({ pageLoad = false } = {}) {
+      globalInstance.pageVisited({
+        meta: {
+          pageLoad,
+        },
+      });
+    }
+
     /**
      * Note that just calling history.pushState() or history.replaceState() won't trigger a popstate event.
      * The popstate event will be triggered by doing a browser action such as a
      * click on the back or forward button (or calling history.back() or history.forward() in JavaScript).
      */
-    addEventListener("popstate", function () {
-      console.log("popstate listener", arguments);
+    addEventListener("popstate", function (event) {
+      console.log("popstate listener", event);
+      onListen();
     });
-    addEventListener("hashchange", function () {
-      console.log("hashchange listener", arguments);
+    addEventListener("hashchange", function (event) {
+      console.log("hashchange listener", event);
+      onListen();
     });
     history.pushState = ((f) =>
       function pushState() {
         var ret = f.apply(this, arguments);
-        console.log("custom pushState", arguments);
-        dispatchEvent(new Event("pushstate", {__arguments: arguments}));
+        dispatchEvent(
+          new CustomEvent("pushstate", {
+            detail: { pushStateArgs: [...arguments] },
+          })
+        );
         return ret;
       })(history.pushState);
-    addEventListener("pushstate", function () {
-      console.log("pushstate listener", arguments);
+    addEventListener("pushstate", function (event) {
+      console.log("pushstate listener", event);
+      onListen();
     });
     history.replaceState = ((f) =>
       function replaceState() {
         var ret = f.apply(this, arguments);
-        console.log("custom replacestate", arguments);
-        dispatchEvent(new Event("replacestate", {__arguments: arguments}));
+        dispatchEvent(
+          new CustomEvent("replacestate", {
+            detail: { replaceStateArgs: [...arguments] },
+          })
+        );
         return ret;
       })(history.replaceState);
-    addEventListener("replacestate", function () {
-      console.log("replacestate listener", arguments);
+    addEventListener("replacestate", function (event) {
+      console.log("replacestate listener", event);
+      onListen();
     });
+    window.onload = function (event) {
+      console.log("onload listener", event);
+      onListen({ pageLoad: true });
+    };
   }
 
   async function heartBeat() {
@@ -156,7 +214,7 @@ export default function () {
           signature: _options.signature,
           clientProperties: {
             appVersion: _options.appVersion,
-            ...clientProperties
+            ...clientProperties,
           },
           uuId: _options.uuid || {
             //TODO-V need to remove
