@@ -9,9 +9,9 @@ on:
     branches:
       # Push events on staging branch
       - staging
-    tags:
+    # tags:
       # Push events to v1.0, v1.1, and v1.9 tags
-      - v1.*
+      # - v1.*
   # pull_request:
   #   branches: [ staging ]
 
