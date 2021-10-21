@@ -59,8 +59,8 @@ jobs:
         shell: bash
         run: mv ./dist ./cdn
         
-      - name: Deploy
-        if: "contains(${{ steps.extract_branch.outputs.SOURCE_NAME }}, 'head') || contains(${{ steps.extract_branch.outputs.SOURCE_NAME }}, 'branch')"
+      - name: Deploy branch
+        if: startsWith(github.ref, 'refs/heads/')
         uses: JamesIves/github-pages-deploy-action@4.0.0
         with:
           token: ${{secrets.PUBLISH_TOKEN}} # Token 
@@ -70,8 +70,8 @@ jobs:
           folder: . # The folder the action should deploy.
           #target-folder : /
       
-      - name: Deploy
-        if: "contains(${{ steps.extract_branch.outputs.SOURCE_NAME }}, 'tag')"
+      - name: Deploy tag
+        if: startsWith(github.ref, 'refs/tags/')
         uses: JamesIves/github-pages-deploy-action@4.0.0
         with:
           token: ${{secrets.PUBLISH_TOKEN}} # Token 
