@@ -35,8 +35,17 @@ jobs:
 
       - name: Extract branch name
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-             echo "::set-output name=sha_short::$(git rev-parse HEAD)"
+        run:
+          echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+          echo "::set-output name=sha_short::$(git rev-parse HEAD)"
+
+          # https://github.community/t/how-to-get-just-the-tag-name/16241
+          # SOURCE_NAME : The branch or the tag
+          # SOURCE_BRANCH : The branch or empty
+          # SOURCE_TAG : The tag or empty
+          echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
+          # echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
+          echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
         id: extract_branch
 
       # Runs a single command using the runners shell
@@ -51,12 +60,24 @@ jobs:
         shell: bash
         run: mv ./dist ./cdn
         
-      - name: Deploy 
+      - name: Deploy
+        if: "contains(steps.extract_branch.outputs.SOURCE_NAME, 'head') || contains(steps.extract_branch.outputs.SOURCE_NAME, 'branch')"
         uses: JamesIves/github-pages-deploy-action@4.0.0
         with:
           token: ${{secrets.PUBLISH_TOKEN}} # Token 
           branch: publish # The branch the action should deploy to.
           #repository-name: cherrybase/cherrybase.github.io # The repo the action should deploy to.
-          commit-message: ${{ steps.extract_branch.outputs.branch }}.${{ steps.extract_branch.outputs.sha_short }}
+          commit-message: ${{ steps.extract_branch.outputs.SOURCE_NAME }}.${{ steps.extract_branch.outputs.branch }}.${{ steps.extract_branch.outputs.sha_short }}
+          folder: . # The folder the action should deploy.
+          #target-folder : /
+      
+      - name: Deploy
+        if: "contains(steps.extract_branch.outputs.SOURCE_NAME, 'tag')"
+        uses: JamesIves/github-pages-deploy-action@4.0.0
+        with:
+          token: ${{secrets.PUBLISH_TOKEN}} # Token 
+          branch: publish_tag # The branch the action should deploy to.
+          #repository-name: cherrybase/cherrybase.github.io # The repo the action should deploy to.
+          commit-message: ${{ steps.extract_branch.outputs.SOURCE_NAME }}.${{ steps.extract_branch.outputs.SOURCE_TAG }}.${{ steps.extract_branch.outputs.sha_short }}
           folder: . # The folder the action should deploy.
           #target-folder : /
