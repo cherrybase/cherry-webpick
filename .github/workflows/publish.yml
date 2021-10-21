@@ -35,13 +35,13 @@ jobs:
 
       - name: Extract branch name
         shell: bash
+        # https://github.community/t/how-to-get-just-the-tag-name/16241
+        # SOURCE_NAME : The branch or the tag
+        # SOURCE_BRANCH : The branch or empty
+        # SOURCE_TAG : The tag or empty
         run:
           echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
           echo "::set-output name=sha_short::$(git rev-parse HEAD)"
-          # https://github.community/t/how-to-get-just-the-tag-name/16241
-          # SOURCE_NAME : The branch or the tag
-          # SOURCE_BRANCH : The branch or empty
-          # SOURCE_TAG : The tag or empty
           echo "::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}"
           # echo "::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}"
           echo "::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}"
