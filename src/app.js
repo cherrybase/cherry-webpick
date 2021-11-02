@@ -123,6 +123,7 @@ export default function () {
         pageLoad,
         pageTitle: pageTitle || window.document.title,
         pageReferrer: pageReferrer || window.document.referrer,
+        pageReferrerDomain: pageReferrerDomain || utils.info.referringDomain(window.document.referrer),
         pageOrigin: pageOrigin || window.document.location.origin,
         pagePathname: pagePathname || window.document.location.pathname,
         pageSearch: pageSearch || window.document.location.search,
