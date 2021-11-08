@@ -114,6 +114,7 @@ export default function () {
         pageLoad = false,
         pageTitle,
         pageReferrer,
+        pageReferrerDomain,
         pageOrigin,
         pagePathname,
         pageSearch,
