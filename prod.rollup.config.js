@@ -4,11 +4,11 @@ import { babel } from "@rollup/plugin-babel";
 import { terser } from "rollup-plugin-terser";
 import json from "@rollup/plugin-json";
 import copy from "rollup-plugin-copy";
-import livereload from "rollup-plugin-livereload";
-import serve from "rollup-plugin-serve";
+// import livereload from "rollup-plugin-livereload";
+// import serve from "rollup-plugin-serve";
 import nodePolyfills from 'rollup-plugin-polyfill-node';
 import { name, version } from "./package.json";
-const isProduction = false || process.env.NODE_ENV === "production";
+const isProduction = true || process.env.NODE_ENV === "production";
 const commonConfig = {
   plugins: [
     json(),
@@ -27,34 +27,34 @@ const commonConfig = {
           { src: 'public/index.html', dest: 'dist' }
         ]
     }),
-    serve({
-      contentBase: ["dist", "public"],
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-      },
-      mimeTypes: {
-        "application/javascript": ["js_commonjs-proxy"],
-      },
-      host: "localhost",
-      port: 9000,
-      onListening: function (server) {
-        console.log(
-          `Server listening at ${"http"}://${"localhost"}:${"9000"}/`
-        );
-      },
-    }),
-    livereload({
-      watch: "dist",
-    }),
+    // serve({
+    //   contentBase: ["dist", "public"],
+    //   headers: {
+    //     "Access-Control-Allow-Origin": "*",
+    //   },
+    //   mimeTypes: {
+    //     "application/javascript": ["js_commonjs-proxy"],
+    //   },
+    //   host: "localhost",
+    //   port: 9000,
+    //   onListening: function (server) {
+    //     console.log(
+    //       `Server listening at ${"http"}://${"localhost"}:${"9000"}/`
+    //     );
+    //   },
+    // }),
+    // livereload({
+    //   watch: "dist",
+    // }),
   ],
-  watch: {
-    clearScreen: false,
-    chokidar: {
-      useFsEvents: false,
-    },
-    include: "src/**",
-    exclude: "node_modules/**",
-  },
+//   watch: {
+//     clearScreen: false,
+//     chokidar: {
+//       useFsEvents: false,
+//     },
+//     include: "src/**",
+//     exclude: "node_modules/**",
+//   },
 };
 const commonOutputConfig = {
   banner: "/* sample head :: SDK version " + version + " */",
