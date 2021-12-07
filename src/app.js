@@ -105,6 +105,7 @@ export default function () {
           }
         );
       } catch (error) {
+        _logger.debug("error while tracking : ", {eventName, eventData, options});
         throw new Error(error);
       }
     },
@@ -199,10 +200,11 @@ export default function () {
       console.log("replacestate listener", event);
       onListen();
     });
-    window.onload = function (event) {
+    // window.onload = function (event) {
+    addEventListener("load", function (event) {
       console.log("onload listener", event);
       onListen({ pageLoad: true });
-    };
+    });
   }
 
   async function heartBeat() {
