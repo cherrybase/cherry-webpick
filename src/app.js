@@ -105,7 +105,7 @@ export default function () {
           }
         );
       } catch (error) {
-        _logger.debug("error while tracking : ", {eventName, eventData = {}, options = {}});
+        _logger.debug("error while tracking : ", {eventName, eventData, options});
         throw new Error(error);
       }
     },
